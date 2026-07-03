@@ -12,15 +12,16 @@ const SEVERITY_TEXT = {
   low: "text-emerald-300",
 };
 
-export default function ClientCard({ name, count, severity }) {
+export default function ClientCard({ name, count, severity, onClick }) {
   return (
-    <div
-      className={`rounded-xl border border-border bg-panel px-4 py-3 hover:bg-panel2 transition-colors ${SEVERITY_RING[severity] || ""}`}
+    <button
+      onClick={onClick}
+      className={`w-full rounded-lg border border-border bg-panel px-3 py-2 text-left transition-colors hover:bg-panel2 ${SEVERITY_RING[severity] || ""}`}
     >
-      <div className="truncate text-sm text-slate-300">{name}</div>
-      <div className={`mt-1 text-2xl font-semibold ${SEVERITY_TEXT[severity] || "text-white"}`}>
+      <div className="truncate text-xs text-slate-300">{name}</div>
+      <div className={`mt-0.5 text-xl font-semibold leading-tight ${SEVERITY_TEXT[severity] || "text-white"}`}>
         {count.toLocaleString("en-IN")}
       </div>
-    </div>
+    </button>
   );
 }
