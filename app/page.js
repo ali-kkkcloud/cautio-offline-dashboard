@@ -12,7 +12,7 @@ import TrendChart from "../components/TrendChart";
 const IndiaLeafletMap = dynamic(() => import("../components/IndiaLeafletMap"), {
   ssr: false,
   loading: () => (
-    <div className="h-[420px] animate-pulse rounded-xl border border-border bg-panel" />
+    <div className="h-[360px] animate-pulse rounded-xl border border-border bg-panel" />
   ),
 });
 
@@ -118,15 +118,6 @@ export default function Page() {
         </div>
       )}
 
-      {data && data.stats.indeterminateCount > 0 && (
-        <div className="mb-6 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-          {data.stats.indeterminateCount} row(s) had neither a usable "Offline Since (hrs)" number
-          nor a parseable "Last Online" date (e.g. #N/A + "Offline" text) — they were{" "}
-          <b>not counted either way</b> so the numbers above stay accurate. Worth checking those
-          rows manually in the sheet.
-        </div>
-      )}
-
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_520px]">
         {/* Left column */}
         <div>
@@ -190,54 +181,34 @@ export default function Page() {
           )}
         </div>
 
-        {/* Right column: map + top clients */}
-        <div className="space-y-6">
+        {/* Right column: map, then Top Affected Cities + Trend right below it */}
+        <div className="space-y-4">
           <IndiaLeafletMap cities={data?.cities ?? []} />
-
-          <div className="rounded-xl border border-border bg-panel p-4">
-            <h3 className="mb-3 text-sm font-semibold text-slate-200">
-              Top Clients Needing Attention
-            </h3>
-            <div className="space-y-2">
-              {(data?.clients ?? []).slice(0, 5).map((c) => (
-                <button
-                  key={c.name}
-                  onClick={() => setSelectedClient(c)}
-                  className="flex w-full items-center justify-between rounded-lg border border-border bg-panel2 px-3 py-2 text-left hover:bg-panel"
-                >
-                  <div>
-                    <div className="text-sm text-slate-200">{c.name}</div>
-                    <div className="text-xs text-slate-500">
-                      {c.cities.slice(0, 2).join(", ")}
-                      {c.cities.length > 2 ? ` +${c.cities.length - 2} more` : ""}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${FILTER_STYLES[c.severity]}`}
-                    >
-                      {c.severity.toUpperCase()}
-                    </span>
-                    <span className="text-lg font-semibold text-white">{c.count}</span>
-                  </div>
-                </button>
-              ))}
-              {(!data || data.clients.length === 0) && (
-                <div className="text-sm text-slate-500">No data yet.</div>
-              )}
-            </div>
-          </div>
+          <TopCitiesPanel cities={data?.cities ?? []} limit={6} />
+          <TrendChart />
         </div>
       </div>
 
-      {/* Top Affected Cities + Offline Trend */}
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <TopCitiesPanel cities={data?.cities ?? []} />
-        <TrendChart />
-      </div>
+      {/* Everything below here is secondary / low-priority — kept out of the
+          main view on purpose so the primary dashboard fits in one screen. */}
+      <div className="mt-8 space-y-3">
+        {data && data.stats.indeterminateCount > 0 && (
+          <details className="rounded-lg border border-border bg-panel/60 px-4 py-2 text-xs text-slate-500">
+            <summary className="cursor-pointer select-none">
+              {data.stats.indeterminateCount} row(s) could not be classified as online/offline —
+              click to see why
+            </summary>
+            <p className="mt-2 leading-relaxed">
+              These rows had neither a usable "Offline Since (hrs)" number nor a parseable "Last
+              Online" date (e.g. #N/A + "Offline" text). They were <b>not counted either way</b> so
+              the numbers above stay accurate. Worth checking those rows manually in the sheet.
+            </p>
+          </details>
+        )}
 
-      <div className="mt-6 text-center text-xs text-slate-600">
-        {updatedAt ? `Last updated ${updatedAt.toLocaleString("en-IN")}` : ""}
+        <div className="text-center text-xs text-slate-600">
+          {updatedAt ? `Last updated ${updatedAt.toLocaleString("en-IN")}` : ""}
+        </div>
       </div>
 
       <ClientDetailModal client={selectedClient} onClose={() => setSelectedClient(null)} />
