@@ -6,6 +6,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { getCityCoordinates } from "../lib/cityCoordinates";
 import indiaGeo from "../lib/indiaGeo.json";
+import indiaStatesGeo from "../lib/indiaStatesGeo.json";
 
 const SEVERITY_COLOR = {
   critical: "#f87171",
@@ -23,6 +24,13 @@ const INDIA_STYLE = {
   dashArray: "1,4",
 };
 
+const STATE_STYLE = {
+  color: "#1d4e56",
+  weight: 1,
+  opacity: 0.85,
+  fill: false,
+};
+
 function makeDotIcon(color, size) {
   return L.divIcon({
     className: "",
@@ -37,6 +45,8 @@ function makeDotIcon(color, size) {
   });
 }
 
+// Fits the map tightly to India's outline on load and locks panning/zoom
+// so the user can never scroll away into empty ocean/black space.
 function FitToIndia() {
   const map = useMap();
   useEffect(() => {
@@ -66,6 +76,7 @@ export default function IndiaLeafletMap({ cities = [] }) {
 
   return (
     <div className="relative overflow-hidden rounded-xl border border-border bg-[#05070a] p-2">
+      {/* Legend — bottom-left */}
       <div className="pointer-events-none absolute bottom-5 left-5 z-[500] rounded-lg border border-border bg-panel2/90 px-3 py-2 text-[11px] leading-6 text-slate-300 backdrop-blur">
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full" style={{ background: SEVERITY_COLOR.critical }} />
@@ -93,16 +104,23 @@ export default function IndiaLeafletMap({ cities = [] }) {
         </div>
       )}
 
+      {/* Small branded watermark instead of the default Leaflet attribution pill */}
+      <div className="pointer-events-none absolute bottom-2 right-3 z-[500] text-[10px] font-medium tracking-wide text-slate-600">
+        cautio
+      </div>
+
       <MapContainer
         center={[22, 80]}
         zoom={4}
         zoomControl={false}
+        attributionControl={false}
         scrollWheelZoom={false}
         style={{ height: "360px", width: "100%", background: "#05070a" }}
       >
         <ZoomControl position="topright" />
         <FitToIndia />
         <GeoJSON data={indiaGeo} style={INDIA_STYLE} />
+        <GeoJSON data={indiaStatesGeo} style={STATE_STYLE} interactive={false} />
         {markers.map((m) => (
           <Marker key={m.city} position={[m.lat, m.lng]} icon={makeDotIcon(SEVERITY_COLOR[m.severity], m.size)}>
             <Popup>
