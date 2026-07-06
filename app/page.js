@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import StatCard from "../components/StatCard";
 import ClientCard from "../components/ClientCard";
 import ClientDetailModal from "../components/ClientDetailModal";
@@ -13,7 +12,7 @@ import TrendChart from "../components/TrendChart";
 const IndiaLeafletMap = dynamic(() => import("../components/IndiaLeafletMap"), {
   ssr: false,
   loading: () => (
-    <div className="h-[360px] animate-pulse rounded-xl border border-border bg-panel" />
+    <div className="h-[300px] animate-pulse rounded-xl border border-border bg-panel" />
   ),
 });
 
@@ -84,17 +83,18 @@ export default function Page() {
   };
 
   return (
-    <main className="mx-auto max-w-[1400px] px-6 py-6">
-      {/* Header */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <div className="mb-1 flex items-center gap-2">
-            <Image src="/cautio-logo.png" alt="Cautio" width={78} height={31} priority />
+    <main className="mx-auto max-w-[1400px] px-6 py-4">
+      {/* Header — logo sits inline next to the title, not stacked above it */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          {/* Plain <img>, not next/image — simpler & predictable for a small static asset */}
+          <img src="/cautio-logo.png" alt="Cautio" className="h-8 w-auto shrink-0" />
+          <div>
+            <h1 className="text-2xl font-bold leading-tight text-white">
+              Vehicles Offline &gt; {data?.offlineHoursThreshold ?? 48} Hours
+            </h1>
+            <p className="text-xs text-slate-400">Fleet Operations Overview</p>
           </div>
-          <h1 className="text-3xl font-bold text-white">
-            Vehicles Offline &gt; {data?.offlineHoursThreshold ?? 48} Hours
-          </h1>
-          <p className="mt-1 text-sm text-slate-400">Fleet Operations Overview</p>
         </div>
         <div className="flex items-center gap-2">
           <div className="rounded-lg border border-border bg-panel px-3 py-2 text-sm text-slate-300">
@@ -117,16 +117,16 @@ export default function Page() {
       </div>
 
       {error && (
-        <div className="mb-6 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+        <div className="mb-4 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
           {error}
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_520px]">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_520px]">
         {/* Left column */}
         <div>
-          {/* Stat cards */}
-          <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {/* Stat cards — compact */}
+          <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <StatCard label="Total Offline Vehicles" value={data?.stats.totalOfflineVehicles ?? "—"} />
             <StatCard label="Total Clients" value={data?.stats.totalClients ?? "—"} />
             <StatCard label="Critical Clients" value={data?.stats.criticalClients ?? "—"} />
@@ -134,19 +134,19 @@ export default function Page() {
           </div>
 
           {/* Filters */}
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-white">
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="text-base font-semibold text-white">
               Clients{" "}
-              <span className="text-sm font-normal text-slate-500">
+              <span className="text-xs font-normal text-slate-500">
                 ({filteredClients.length})
               </span>
             </h2>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {FILTERS.map((f) => (
                 <button
                   key={f.key}
                   onClick={() => setFilter(f.key)}
-                  className={`rounded-full border px-3 py-1 text-xs font-semibold transition-opacity ${FILTER_STYLES[f.key]} ${
+                  className={`rounded-full border px-2.5 py-0.5 text-[11px] font-semibold transition-opacity ${FILTER_STYLES[f.key]} ${
                     filter === f.key ? "opacity-100 ring-1 ring-white/30" : "opacity-60 hover:opacity-90"
                   }`}
                 >
@@ -155,8 +155,6 @@ export default function Page() {
               ))}
             </div>
           </div>
-
-          <p className="mb-3 text-xs text-slate-500">Click any client card to see its vehicle numbers &amp; cities.</p>
 
           {/* Client grid — compact, more columns */}
           {loading && !data ? (
@@ -185,21 +183,18 @@ export default function Page() {
           )}
         </div>
 
-        {/* Right column: map only */}
-        <div>
+        {/* Right column: map on top, Trend + Top Cities side by side right below it */}
+        <div className="space-y-3">
           <IndiaLeafletMap cities={data?.cities ?? []} />
+          <div className="grid grid-cols-2 gap-3">
+            <TrendChart />
+            <TopCitiesPanel cities={data?.cities ?? []} limit={5} />
+          </div>
         </div>
       </div>
 
-      {/* Top Affected Cities + Offline Trend — side by side, full width */}
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <TopCitiesPanel cities={data?.cities ?? []} limit={8} />
-        <TrendChart />
-      </div>
-
-      {/* Everything below here is secondary / low-priority — kept out of the
-          main view on purpose so the primary dashboard fits in one screen. */}
-      <div className="mt-8 space-y-3">
+      {/* Low-priority stuff, tucked out of the way at the very bottom */}
+      <div className="mt-4 space-y-2">
         {data && data.stats.indeterminateCount > 0 && (
           <details className="rounded-lg border border-border bg-panel/60 px-4 py-2 text-xs text-slate-500">
             <summary className="cursor-pointer select-none">
@@ -216,6 +211,7 @@ export default function Page() {
 
         <div className="text-center text-xs text-slate-600">
           {updatedAt ? `Last updated ${updatedAt.toLocaleString("en-IN")}` : ""}
+          {" · "}Click any client card to see its vehicle numbers &amp; cities.
         </div>
       </div>
 
