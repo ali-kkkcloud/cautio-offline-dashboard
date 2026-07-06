@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import StatCard from "../components/StatCard";
 import ClientCard from "../components/ClientCard";
 import ClientDetailModal from "../components/ClientDetailModal";
@@ -87,6 +88,9 @@ export default function Page() {
       {/* Header */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
+          <div className="mb-1 flex items-center gap-2">
+            <Image src="/cautio-logo.png" alt="Cautio" width={78} height={31} priority />
+          </div>
           <h1 className="text-3xl font-bold text-white">
             Vehicles Offline &gt; {data?.offlineHoursThreshold ?? 48} Hours
           </h1>
@@ -181,12 +185,16 @@ export default function Page() {
           )}
         </div>
 
-        {/* Right column: map, then Top Affected Cities + Trend right below it */}
-        <div className="space-y-4">
+        {/* Right column: map only */}
+        <div>
           <IndiaLeafletMap cities={data?.cities ?? []} />
-          <TopCitiesPanel cities={data?.cities ?? []} limit={6} />
-          <TrendChart />
         </div>
+      </div>
+
+      {/* Top Affected Cities + Offline Trend — side by side, full width */}
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <TopCitiesPanel cities={data?.cities ?? []} limit={8} />
+        <TrendChart />
       </div>
 
       {/* Everything below here is secondary / low-priority — kept out of the
