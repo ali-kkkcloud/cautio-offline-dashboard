@@ -115,7 +115,7 @@ export default function IndiaLeafletMap({ cities = [] }) {
         zoomControl={false}
         attributionControl={false}
         scrollWheelZoom={false}
-        style={{ height: "360px", width: "100%", background: "#05070a" }}
+        style={{ height: "300px", width: "100%", background: "#05070a" }}
       >
         <ZoomControl position="topright" />
         <FitToIndia />
@@ -138,14 +138,6 @@ export default function IndiaLeafletMap({ cities = [] }) {
           </Marker>
         ))}
       </MapContainer>
-
-      {skippedCities > 0 && (
-        <p className="mt-2 px-2 text-[11px] text-slate-500">
-          {skippedCities} {skippedCities === 1 ? "city isn't" : "cities aren't"} in the coordinates
-          list yet, so {skippedCities === 1 ? "it isn't" : "they aren't"} plotted (still counted
-          everywhere else).
-        </p>
-      )}
     </div>
   );
 }
