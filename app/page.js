@@ -12,7 +12,7 @@ import TrendChart from "../components/TrendChart";
 const IndiaLeafletMap = dynamic(() => import("../components/IndiaLeafletMap"), {
   ssr: false,
   loading: () => (
-    <div className="h-[300px] animate-pulse rounded-xl border border-border bg-panel" />
+    <div className="h-[340px] animate-pulse rounded-xl border border-border bg-panel" />
   ),
 });
 
@@ -84,17 +84,18 @@ export default function Page() {
 
   return (
     <main className="mx-auto max-w-[1400px] px-6 py-4">
-      {/* Header — logo sits inline next to the title, not stacked above it */}
+      {/* Logo — centered, on its own row above everything */}
+      <div className="mb-3 flex justify-center">
+        <img src="/cautio-logo.png" alt="Cautio" className="h-14 w-auto" />
+      </div>
+
+      {/* Header */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          {/* Plain <img>, not next/image — simpler & predictable for a small static asset */}
-          <img src="/cautio-logo.png" alt="Cautio" className="h-8 w-auto shrink-0" />
-          <div>
-            <h1 className="text-2xl font-bold leading-tight text-white">
-              Vehicles Offline &gt; {data?.offlineHoursThreshold ?? 48} Hours
-            </h1>
-            <p className="text-xs text-slate-400">Fleet Operations Overview</p>
-          </div>
+        <div>
+          <h1 className="text-2xl font-bold leading-tight text-white">
+            Vehicles Offline &gt; {data?.offlineHoursThreshold ?? 48} Hours
+          </h1>
+          <p className="text-xs text-slate-400">Fleet Operations Overview</p>
         </div>
         <div className="flex items-center gap-2">
           <div className="rounded-lg border border-border bg-panel px-3 py-2 text-sm text-slate-300">
@@ -122,7 +123,7 @@ export default function Page() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_520px]">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_600px]">
         {/* Left column */}
         <div>
           {/* Stat cards — compact */}
