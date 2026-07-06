@@ -98,7 +98,7 @@ export default function IndiaLeafletMap({ cities = [] }) {
         zoom={4}
         zoomControl={false}
         scrollWheelZoom={false}
-        style={{ height: "540px", width: "100%", background: "#05070a" }}
+        style={{ height: "360px", width: "100%", background: "#05070a" }}
       >
         <ZoomControl position="topright" />
         <FitToIndia />
